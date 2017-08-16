@@ -1,6 +1,8 @@
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <cstdlib> //std::system
 #include <sstream>
+#include <string>
+#include <iostream>
 
 int main (int argc, char *argv[])
 {
@@ -19,6 +21,9 @@ int main (int argc, char *argv[])
       //Allocate a portion of the segment (raw memory)
       managed_shared_memory::size_type free_memory = segment.get_free_memory();
       void * shptr = segment.allocate(1024/*bytes to allocate*/);
+
+      const char* test = "Hello world!";
+      memcpy(shptr, test, 12);
 
       //Check invariant
       if(free_memory <= segment.get_free_memory())
@@ -50,6 +55,8 @@ int main (int argc, char *argv[])
 
       //Get buffer local address from handle
       void *msg = segment.get_address_from_handle(handle);
+
+      std::cout << "Memory from other process: " << static_cast<const char*>(msg) << std::endl;
 
       //Deallocate previously allocated memory
       segment.deallocate(msg);
