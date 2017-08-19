@@ -1,13 +1,13 @@
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 
+bin/*
 *~
 *.autosave
 *.a
 *.core
 *.moc
 *.o
-*.obj
 *.orig
 *.rej
 *.so
