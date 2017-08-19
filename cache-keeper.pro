@@ -6,4 +6,11 @@ CONFIG -= qt
 macx: LIBS += -L/usr/local/lib -lboost_filesystem -lboost_system -lboost_thread -lrt -pthread
 linux: LIBS += -L/usr/local/lib -lboost_filesystem -lboost_system -lboost_thread -lrt -pthread
 
-SOURCES += main.cpp
+SOURCES += src/main.cpp \
+    src/keeper.cpp \
+    src/user.cpp \
+    src/server.cpp \
+    src/client.cpp
+
+DISTFILES += \
+    Makefile
