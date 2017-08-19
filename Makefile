@@ -18,19 +18,18 @@ LDFLAGS=
 CFLAGS=$(INCFLAGS) $(DBGFLAGS)
 
 
-
 all:
 	make server
 	make client
-	
+
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CLFAGS)
 
 
-server: obj/server.o
+server: $(OBJDIR)/server.o
 	$(CC) $< -o $(BINDIR)/server $(LDFLAGS)
 
-client: obj/client.o
+client: $(OBJDIR)/client.o
 	$(CC) $< -o $(BINDIR)/client $(LDFLAGS)
 
 clean:
