@@ -1,6 +1,6 @@
-BASEDIR=$(dirname "$0")
+BASEDIR=$(dirname $(realpath "$0"))
 echo $BASEDIR
-PATHTOBIN=`pwd`/$BASEDIR/../bin
+PATHTOBIN=$BASEDIR/../bin
 LOGFILE=$PATHTOBIN/../log/server.out
 touch $LOGFILE
 echo $PATHTOBIN
