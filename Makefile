@@ -17,20 +17,25 @@ LDFLAGS=
 
 CFLAGS=$(INCFLAGS) $(DBGFLAGS)
 
+LIB_OBJ=IBinarySerializable.o TestSerializable.o
 
-all:
-	make server
-	make client
+_OBJ_SERVER=server.o $(LIB_OBJ)
+_OBJ_CLIENT=client.o $(LIB_OBJ)
+
+OBJ_SERVER=$(patsubst %,$(OBJDIR)/%,$(_OBJ_SERVER))
+OBJ_CLIENT=$(patsubst %,$(OBJDIR)/%,$(_OBJ_CLIENT))
+
+all: server client
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)
-	$(CC) -c -o $@ $< $(CLFAGS)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
-
-server: $(OBJDIR)/server.o
+server: $(OBJ_SERVER)
+	echo $(OBJ_SERVER)
 	$(CC) $< -o $(BINDIR)/server $(LDFLAGS)
 
-client: $(OBJDIR)/client.o
+client: $(OBJ_CLIENT)
 	$(CC) $< -o $(BINDIR)/client $(LDFLAGS)
 
 clean:
-	rm -f $(OBJDIR)/*.o 
+	rm -f $(OBJDIR)/*.o

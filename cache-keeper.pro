@@ -6,11 +6,17 @@ CONFIG -= qt
 macx: LIBS += -L/usr/local/lib -lboost_filesystem -lboost_system -lboost_thread -lrt -pthread
 linux: LIBS += -L/usr/local/lib -lboost_filesystem -lboost_system -lboost_thread -lrt -pthread
 
-SOURCES += src/main.cpp \
-    src/keeper.cpp \
-    src/user.cpp \
+SOURCES += \
     src/server.cpp \
-    src/client.cpp
+    src/client.cpp \
+    src/TestSerializable.cpp \
+    src/IBinarySerializable.cpp
 
 DISTFILES += \
     Makefile
+
+HEADERS += \
+    inc/IBinarySerializable.h \
+    inc/TestSerializable.h
+
+INCLUDEPATH += inc/
