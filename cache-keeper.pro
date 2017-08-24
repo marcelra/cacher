@@ -10,7 +10,8 @@ SOURCES += \
     src/server.cpp \
     src/client.cpp \
     src/TestSerializable.cpp \
-    src/IBinarySerializable.cpp
+    src/IBinarySerializable.cpp \
+    src/testsuite.cpp
 
 DISTFILES += \
     Makefile

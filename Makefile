@@ -11,7 +11,7 @@ INCDIR=inc
 SRCDIR=src
 BINDIR=bin
 
-DEPS=
+DEPS=$(INCDIR)/%.h
 INCFLAGS=-I$(INCDIR)
 LDFLAGS=
 
@@ -21,13 +21,15 @@ LIB_OBJ=IBinarySerializable.o TestSerializable.o
 
 _OBJ_SERVER=server.o $(LIB_OBJ)
 _OBJ_CLIENT=client.o $(LIB_OBJ)
+_OBJ_TESTSUITE=testsuite.o IBinarySerializable.o TestSerializable.o
 
 OBJ_SERVER=$(patsubst %,$(OBJDIR)/%,$(_OBJ_SERVER))
 OBJ_CLIENT=$(patsubst %,$(OBJDIR)/%,$(_OBJ_CLIENT))
+OBJ_TESTSUITE=$(patsubst %,$(OBJDIR)/%,$(_OBJ_TESTSUITE))
+   
+all: server client testsuite
 
-all: server client
-
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(DEPS)
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp 
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 server: $(OBJ_SERVER)
@@ -37,5 +39,13 @@ server: $(OBJ_SERVER)
 client: $(OBJ_CLIENT)
 	$(CC) $< -o $(BINDIR)/client $(LDFLAGS)
 
+testsuite: $(OBJ_TESTSUITE)
+	$(CC) $(OBJ_TESTSUITE) -o $(BINDIR)/testsuite $(LDFLAGS)
+
 clean:
 	rm -f $(OBJDIR)/*.o
+
+dbg_makefile:
+	echo $(OBJ_SERVER)
+
+

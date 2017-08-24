@@ -8,6 +8,8 @@
 #include <thread>
 #include <chrono>
 
+#include "IBinarySerializable.h"
+
 
 
 const char* to_server_fifo_name = "/tmp/to_server";

@@ -8,8 +8,11 @@ class TestSerializable : public IBinarySerializable
    public:
       TestSerializable();
 
-      IBinarySerializable::BinaryBlob toBinaryBlob();
-      IBinarySerializable* fromBinaryBlob(BinaryBlob);
+      BinaryBlob toBinaryBlob();
+      void fromBinaryBlob(BinaryBlob);
+
+      int getData() const;
+      void setData(int value);
 
    private:
       int      m_integer;
