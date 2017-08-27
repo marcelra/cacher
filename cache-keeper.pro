@@ -11,13 +11,15 @@ SOURCES += \
     src/client.cpp \
     src/TestSerializable.cpp \
     src/IBinarySerializable.cpp \
-    src/testsuite.cpp
+    src/testsuite.cpp \
+    src/SerializableRealVector.cpp
 
 DISTFILES += \
     Makefile
 
 HEADERS += \
     inc/IBinarySerializable.h \
-    inc/TestSerializable.h
+    inc/TestSerializable.h \
+    inc/SerializableRealVector.h
 
 INCLUDEPATH += inc/

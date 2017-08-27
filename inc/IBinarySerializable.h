@@ -14,8 +14,9 @@ class BinaryBlob
 
       BinaryBlob& operator=(const BinaryBlob& other);
 
-      char*    getData();
-      void     trash();
+      const char* getData() const;
+      char*       getData();
+      void        clearData();
 
    private:
       char*    m_ptr;
@@ -28,8 +29,8 @@ class IBinarySerializable
 {
    public:
 
-      virtual BinaryBlob toBinaryBlob() = 0;
-      virtual void fromBinaryBlob(BinaryBlob) = 0;
+      virtual BinaryBlob toBinaryBlob() const = 0;
+      virtual void fromBinaryBlob(const BinaryBlob& blob) = 0;
 };
 
 #endif // IBINARYSERIALIZER_H

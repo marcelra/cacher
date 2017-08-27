@@ -7,7 +7,6 @@ BinaryBlob::BinaryBlob(size_t size) :
    m_size(size)
 {
    m_ptr = new char[size];
-   std::cout << "Create: " << (void*) m_ptr << std::endl;
 }
 
 
@@ -36,14 +35,20 @@ BinaryBlob& BinaryBlob::operator=(const BinaryBlob& other)
 
 char* BinaryBlob::getData()
 {
+   return const_cast<char*>(const_cast<const BinaryBlob*>(this)->getData());
+}
+
+
+
+const char* BinaryBlob::getData() const
+{
    return m_ptr;
 }
 
 
 
-void BinaryBlob::trash()
+void BinaryBlob::clearData()
 {
-   std::cout << "Trash: " << (void*) m_ptr << std::endl;
    delete[] m_ptr;
    m_ptr = 0;
 }

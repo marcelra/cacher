@@ -5,12 +5,12 @@
 
 
 TestSerializable::TestSerializable() :
-   m_integer(42)
+   m_integer(0)
 {}
 
 
 
-BinaryBlob TestSerializable::toBinaryBlob()
+BinaryBlob TestSerializable::toBinaryBlob() const
 {
    size_t size = sizeof(TestSerializable);
    BinaryBlob blob(size);
@@ -22,9 +22,9 @@ BinaryBlob TestSerializable::toBinaryBlob()
 
 
 
-void TestSerializable::fromBinaryBlob(BinaryBlob blob)
+void TestSerializable::fromBinaryBlob(const BinaryBlob& blob)
 {
-   *this = TestSerializable(*reinterpret_cast<TestSerializable*>(blob.getData()));
+   *this = TestSerializable(*reinterpret_cast<const TestSerializable*>(blob.getData()));
 }
 
 

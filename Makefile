@@ -3,7 +3,7 @@
 
 
 CC=g++
-DBGFLAGS=-O0 -g
+DBGFLAGS=-O0
 LIB=
 
 OBJDIR=obj
@@ -17,19 +17,19 @@ LDFLAGS=
 
 CFLAGS=$(INCFLAGS) $(DBGFLAGS)
 
-LIB_OBJ=IBinarySerializable.o TestSerializable.o
+LIB_OBJ=IBinarySerializable.o TestSerializable.o SerializableRealVector.o
 
 _OBJ_SERVER=server.o $(LIB_OBJ)
 _OBJ_CLIENT=client.o $(LIB_OBJ)
-_OBJ_TESTSUITE=testsuite.o IBinarySerializable.o TestSerializable.o
+_OBJ_TESTSUITE=testsuite.o IBinarySerializable.o TestSerializable.o SerializableRealVector.o
 
 OBJ_SERVER=$(patsubst %,$(OBJDIR)/%,$(_OBJ_SERVER))
 OBJ_CLIENT=$(patsubst %,$(OBJDIR)/%,$(_OBJ_CLIENT))
 OBJ_TESTSUITE=$(patsubst %,$(OBJDIR)/%,$(_OBJ_TESTSUITE))
-   
+
 all: server client testsuite
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp 
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 server: $(OBJ_SERVER)
