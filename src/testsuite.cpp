@@ -2,6 +2,8 @@
 
 #include "TestSerializable.h"
 #include "SerializableRealVector.h"
+#include "Request.h"
+#include "Response.h"
 
 #include <thread>
 #include <chrono>
@@ -69,15 +71,41 @@ bool testSerializableRealVector(size_t n)
 
 
 
+bool testRequest()
+{
+   {
+      auto request = Request::store(128);
+      std::cout << request << std::endl;
+   }
+
+   {
+      auto request = Request::retrieve("ELEMENT");
+      std::cout << request << std::endl;
+   }
+
+   {
+      auto response = Response::responseAcknowledge();
+      std::cout << response << std::endl;
+   }
+   {
+      auto response = Response::responseNotOk();
+      std::cout << response << std::endl;
+   }
+   {
+      auto response = Response::announceMessage(128);
+      std::cout << response << std::endl;
+   }
+}
+
+
+
 int main()
 {
 
-   // for (size_t i=0; i < 10e6; ++i)
-   // {
-   testSerializable();
-   // }
+   // testSerializable();
+   // testSerializableRealVector(20000000000/16);
 
-   testSerializableRealVector(20000000000/16);
+   testRequest();
 
 
 
