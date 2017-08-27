@@ -7,8 +7,12 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <map>
+#include <cassert>
 
 #include "IBinarySerializable.h"
+#include "Request.h"
+#include "Response.h"
 
 
 
@@ -52,9 +56,45 @@ void handleSignal(int) {
 
 
 
+void send(void* data, size_t numBytes)
+{
+   int fd_write = open(from_server_fifo_name, O_WRONLY);
+   write(fd_write, data, numBytes);
+   close(fd_write);
+}
+
+
+
+void receive(void* buffer, size_t numBytes)
+{
+   int fd_read = open(to_server_fifo_name, O_RDONLY);
+   read(fd_read, buffer, sizeof(Request));
+   close(fd_read);
+}
+
+
+
+template<class T> void sendObj(const T& obj)
+{
+   send(const_cast<T*>(&obj), sizeof(T));
+}
+
+
+
+template<class T> T receiveObj()
+{
+   T obj;
+   receive(&obj, sizeof(T));
+   return obj;
+}
+
+
+
 int main()
 /// Comments
 {
+
+   std::map<std::string, std::string> store;
 
    // commented out code
    signal(SIGINT, handleSignal);
@@ -62,24 +102,92 @@ int main()
    mkfifo(to_server_fifo_name, 0666);
    mkfifo(from_server_fifo_name, 0666);
 
+   int fd_read;
+   int fd_write;
+
    while (true)
    {
-      std::cout << "Server running in lazy mode..." << std::endl;
+      std::cout << "Server running..." << std::endl;
 
-      char buf[1024];
 
-      int fd_read = open(to_server_fifo_name, O_RDONLY);
-      read(fd_read, buf, 1024);
-      close(fd_read);
+      /// Wait for request
+      auto request = receiveObj<Request>();
+      std::cout << "Received request " << request << std::endl;
 
-      std::string command(buf);
-      std::cout << "Received: " << buf << std::endl;
-      std::string genResponse = to_upper(command);
-      std::cout << "Sending: " << genResponse << std::endl;
+      if (request.isStoreRequest())
+      {
+         auto key = request.getKey();
 
-      int fd_write = open(from_server_fifo_name, O_WRONLY);
-      write(fd_write, genResponse.c_str(), 1024);
-      close(fd_write);
+         std::cout << "Key = '" << key << "'" << std::endl;
+
+         /// Acknowledge
+         sendObj<Response>(Response::responseAcknowledge());
+
+
+         /// Retrieve message
+         std::unique_ptr<char> msg(new char[request.getNumBytes()]);
+         receive(msg.get(), request.getNumBytes());
+
+         std::string command(msg.get());
+
+         std::cout << "Storing with key '" << key << "'" << std::endl;
+         store[key] = command;
+
+         std::cout << "Store contents: " << std::endl;
+         for(auto it = store.begin();
+             it != store.end(); ++it)
+         {
+             std::cout << it->first << " " << it->second << std::endl;
+         }
+
+         // std::string command(msg.get());
+         std::cout << "Received message: '" << command << "'" << std::endl;
+         std::string genResponse = to_upper(command);
+      }
+      else if (request.isRetrieveRequest())
+      {
+         std::cout << "Store contents: " << std::endl;
+         for(auto it = store.begin();
+             it != store.end(); ++it)
+         {
+             std::cout << it->first.length() << ", " << it->first << ": " << it->second << std::endl;
+         }
+
+         auto key = request.getKey();
+         std::cout << "Key here = '" << key << "'" << std::endl;
+
+
+         if (store.find(key) == store.end())
+         {
+            std::cout << "WARNING: KEY NOT FOUND" << std::endl;
+            sendObj<Response>(Response::keyNotFound());
+
+            continue;
+         }
+
+         const std::string& message = store[key];
+
+         sendObj<Response>(Response::announceMessage(message.length()));
+
+         auto response = receiveObj<Response>();
+         std::cout << "Received response: " << response << std::endl;
+         if (response.getType() == Response::ACKNOWLEDGE)
+         {
+            std::cout << "Sending: '" << message << "'" << std::endl;
+
+            send(const_cast<char*>(message.c_str()), message.length());
+         }
+         else
+         {
+            std::cout << "Not sending data!" << std::endl;
+         }
+      }
+      else
+      {
+         sendObj<Response>(Response::responseNotOk());
+         std::cout << "Not a valid request received." << std::endl;
+         continue;
+      }
    }
 
    return 0;

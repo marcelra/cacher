@@ -1,11 +1,19 @@
 #include "Request.h"
 
+#include <stdlib.h>
+
 #include <cassert>
 #include <ostream>
+#include <string.h>
 
 
 
-std::string emptyKey(128, '_');
+std::string emptyKey(MAX_KEY_LENGTH, '_');
+
+
+
+Request::Request()
+{}
 
 
 
@@ -13,7 +21,7 @@ Request::Request(size_t numBytes) :
    m_type(Request::STORE),
    m_numBytes(numBytes)
 {
-   std::copy(emptyKey.begin(), emptyKey.end(), m_key);
+   memcpy(m_key, emptyKey.c_str(), MAX_KEY_LENGTH);
 }
 
 
@@ -22,16 +30,19 @@ Request::Request(const std::string& key) :
    m_type(Request::RETRIEVE),
    m_numBytes(0)
 {
-   std::copy(emptyKey.begin(), emptyKey.end(), m_key);
-   assert(key.length() < 128);
-   std::copy(key.begin(), key.end(), m_key);
+   memcpy(m_key, emptyKey.c_str(), MAX_KEY_LENGTH);
+   assert(key.length() < MAX_KEY_LENGTH);
+   memcpy(m_key, key.c_str(), MAX_KEY_LENGTH);
 }
 
 
 
-Request Request::store(size_t numBytes)
+Request Request::store(const std::string& key, size_t numBytes)
 {
-   return Request(numBytes);
+   Request req(key);
+   req.m_numBytes = numBytes;
+   req.m_type = Request::STORE;
+   return req;
 }
 
 

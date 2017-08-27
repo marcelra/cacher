@@ -23,8 +23,8 @@ LIB_OBJ=IBinarySerializable.o \
         Request.o \
         Response.o
 
-_OBJ_SERVER=server.o $(LIB_OBJ)
-_OBJ_CLIENT=client.o $(LIB_OBJ)
+_OBJ_SERVER=server.o Request.o Response.o
+_OBJ_CLIENT=client.o Request.o Response.o
 _OBJ_TESTSUITE=testsuite.o IBinarySerializable.o TestSerializable.o SerializableRealVector.o Request.o Response.o
 
 OBJ_SERVER=$(patsubst %,$(OBJDIR)/%,$(_OBJ_SERVER))
@@ -38,10 +38,10 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 
 server: $(OBJ_SERVER)
 	echo $(OBJ_SERVER)
-	$(CC) $< -o $(BINDIR)/server $(LDFLAGS)
+	$(CC) $(OBJ_SERVER) -o $(BINDIR)/server $(LDFLAGS)
 
 client: $(OBJ_CLIENT)
-	$(CC) $< -o $(BINDIR)/client $(LDFLAGS)
+	$(CC) $(OBJ_CLIENT) -o $(BINDIR)/client $(LDFLAGS)
 
 testsuite: $(OBJ_TESTSUITE)
 	$(CC) $(OBJ_TESTSUITE) -o $(BINDIR)/testsuite $(LDFLAGS)

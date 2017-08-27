@@ -10,7 +10,8 @@ class Response
       {
          NOT_OK = 0,
          ACKNOWLEDGE,
-         ANNOUNCE
+         ANNOUNCE,
+         KEY_NOT_FOUND
       };
 
    public:
@@ -18,9 +19,11 @@ class Response
       static Response responseNotOk();
       static Response responseAcknowledge();
       static Response announceMessage(size_t numBytes);
+      static Response keyNotFound();
 
    public:
 
+      Response();
       Response(const Type& type, size_t numBytes);
 
       Type getType() const;

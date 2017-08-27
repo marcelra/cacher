@@ -4,6 +4,11 @@
 
 
 
+Response::Response()
+{}
+
+
+
 Response::Response(const Response::Type& type, size_t numBytes) :
    m_type(type),
    m_numBytes(numBytes)
@@ -28,6 +33,13 @@ Response Response::responseAcknowledge()
 Response Response::announceMessage(size_t numBytes)
 {
    return Response(ANNOUNCE, numBytes);
+}
+
+
+
+Response Response::keyNotFound()
+{
+   return Response(KEY_NOT_FOUND, 0);
 }
 
 

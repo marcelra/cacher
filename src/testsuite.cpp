@@ -74,7 +74,7 @@ bool testSerializableRealVector(size_t n)
 bool testRequest()
 {
    {
-      auto request = Request::store(128);
+      auto request = Request::store("myKey", 128);
       std::cout << request << std::endl;
    }
 

@@ -5,6 +5,10 @@
 
 
 
+const size_t MAX_KEY_LENGTH = 128;
+
+
+
 class Request
 {
    public:
@@ -16,7 +20,7 @@ class Request
       };
 
    public:
-      static Request store(size_t numBytes);
+      static Request store(const std::string& key, size_t numBytes);
       static Request retrieve(const std::string& key);
 
       bool isStoreRequest() const;
@@ -25,6 +29,8 @@ class Request
       bool isRetrieveRequest() const;
       std::string getKey() const;
 
+      Request();
+
    private:
       Request(const std::string& key);
       Request(size_t numBytes);
@@ -32,9 +38,9 @@ class Request
    friend std::ostream& operator<<(std::ostream& os, const Request& request);
 
    private:
+      char      m_key[MAX_KEY_LENGTH];
       Type      m_type;
       size_t    m_numBytes;
-      char      m_key[128];
 };
 
 
