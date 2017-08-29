@@ -24,7 +24,13 @@ const char* fromServerFifoName = "/tmp/from_server";
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+/// handleSignal
+////////////////////////////////////////////////////////////////////////////////
 void handleSignal(int) {
+   /**
+    * Handles SIGTERM and SIGINT signals
+    */
    std::cout << "Shutdown server..." << std::endl;
    unlink(toServerFifoName);
    unlink(fromServerFifoName);
@@ -33,60 +39,46 @@ void handleSignal(int) {
 
 
 
-void send(void* data, size_t numBytes)
-{
-   int fd_write = open(fromServerFifoName, O_WRONLY);
-   write(fd_write, data, numBytes);
-   close(fd_write);
-}
-
-
-
-void receive(void* buffer, size_t numBytes)
-{
-   int fd_read = open(toServerFifoName, O_RDONLY);
-   read(fd_read, buffer, numBytes);
-   close(fd_read);
-}
-
-
-
-template<class T> void sendObj(const T& obj)
-{
-   send(const_cast<T*>(&obj), sizeof(T));
-}
-
-
-
-template<class T> T receiveObj()
-{
-   T obj;
-   receive(&obj, sizeof(T));
-   return obj;
-}
-
-
-
-
+////////////////////////////////////////////////////////////////////////////////
+/// Server class definition
+////////////////////////////////////////////////////////////////////////////////
 class Server : public FifoCommunicator
 {
    public:
+      /**
+       * Create a server connecting to @param toServerFifoName for reading and
+       * @param from ServerFifoName for writing.
+       */
       Server(const std::string& toServerFifoName, const std::string& fromServerFifoName);
+
+      /**
+       * Server destructor. Does nothing, since the run function is blocking and app will
+       * generally hang there. App should be closed by SIGTERM or SIGINT signals.
+       */
       ~Server();
 
    public:
+      /**
+       * Run server. Blocking call.
+       */
       void run();
 
    private:
+      /// Handle a store request
       void handleStoreRequest(const Request& request);
+
+      /// Handle a retrieve request
       void handleRetrieveRequest(const Request& request);
 
    private:
-      std::map<std::string, BinaryBlob*> m_store;
+      std::map<std::string, BinaryBlob*> m_store;  //! BinaryBlob storage
 };
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+/// Server constructor
+////////////////////////////////////////////////////////////////////////////////
 Server::Server(const std::string& toServerFifoName, const std::string& fromServerFifoName) :
    FifoCommunicator(fromServerFifoName, toServerFifoName)
 {
@@ -98,12 +90,18 @@ Server::Server(const std::string& toServerFifoName, const std::string& fromServe
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+/// Server destructor
+////////////////////////////////////////////////////////////////////////////////
 Server::~Server()
 {
 }
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+/// Server::run
+////////////////////////////////////////////////////////////////////////////////
 void Server::run()
 {
    while (true)
@@ -129,6 +127,9 @@ void Server::run()
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+/// Server::handleStoreRequest
+////////////////////////////////////////////////////////////////////////////////
 void Server::handleStoreRequest(const Request& request)
 {
    std::cout << "INFO: in handleStoreRequest()..." << std::endl;
@@ -149,6 +150,9 @@ void Server::handleStoreRequest(const Request& request)
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+/// Server::handleRetrieveRequest
+////////////////////////////////////////////////////////////////////////////////
 void Server::handleRetrieveRequest(const Request& request)
 {
    std::cout << "INFO: in handleRetrieveRequest()..." << std::endl;
@@ -180,6 +184,9 @@ void Server::handleRetrieveRequest(const Request& request)
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+/// main function
+////////////////////////////////////////////////////////////////////////////////
 int main()
 /// Comments
 {
@@ -191,103 +198,3 @@ int main()
 }
 
 
-
-int oldMain()
-{
-   std::map<std::string, BinaryBlob*> store;
-
-   // commented out code
-   signal(SIGINT, handleSignal);
-
-   mkfifo(toServerFifoName, 0666);
-   mkfifo(fromServerFifoName, 0666);
-
-   int fd_read;
-   int fd_write;
-
-   while (true)
-   {
-      std::cout << "Server running..." << std::endl;
-
-
-      /// Wait for request
-      auto request = receiveObj<Request>();
-      std::cout << "Received request " << request << std::endl;
-
-      if (request.isStoreRequest())
-      {
-         auto key = request.getKey();
-
-         std::cout << "Key = '" << key << "'" << std::endl;
-
-         /// Acknowledge
-         sendObj<Response>(Response::responseAcknowledge());
-
-
-         /// Retrieve message
-         char* msg = new char[request.getNumBytes()];
-         receive(msg, request.getNumBytes());
-
-         // std::cout << "Raw data received:" << std::endl;
-         // Utils::binaryDump(msg, request.getNumBytes());
-
-         BinaryBlob* blob = new BinaryBlob(msg, request.getNumBytes());
-
-         std::cout << "Storing with key '" << key << "'" << std::endl;
-         store[key] = blob;
-
-         std::cout << "Store contents: " << std::endl;
-         for(auto it = store.begin();
-             it != store.end(); ++it)
-         {
-             std::cout << it->first << ": chunck of " << it->second->getSize() << std::endl;
-         }
-      }
-      else if (request.isRetrieveRequest())
-      {
-         std::cout << "Store contents: " << std::endl;
-         for(auto it = store.begin();
-             it != store.end(); ++it)
-         {
-             std::cout << it->first << ": chunck of " << it->second->getSize() << std::endl;
-         }
-
-         auto key = request.getKey();
-         std::cout << "Key here = '" << key << "'" << std::endl;
-
-
-         if (store.find(key) == store.end())
-         {
-            std::cout << "WARNING: KEY NOT FOUND" << std::endl;
-            sendObj<Response>(Response::keyNotFound());
-
-            continue;
-         }
-
-         BinaryBlob* message = store[key];
-
-         sendObj<Response>(Response::announceMessage(message->getSize()));
-
-         auto response = receiveObj<Response>();
-         std::cout << "Received response: " << response << std::endl;
-         if (response.getType() == Response::ACKNOWLEDGE)
-         {
-            std::cout << "Sending " << message->getSize() << " bytes..." << std::endl;
-
-            send((void*)(message->getData()), message->getSize());
-         }
-         else
-         {
-            std::cout << "No acknowledge received!" << std::endl;
-         }
-      }
-      else
-      {
-         sendObj<Response>(Response::responseNotOk());
-         std::cout << "Not a valid request received." << std::endl;
-         continue;
-      }
-   }
-
-   return 0;
-}
