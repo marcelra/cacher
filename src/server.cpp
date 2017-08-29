@@ -13,6 +13,8 @@
 #include "IBinarySerializable.h"
 #include "Request.h"
 #include "Response.h"
+#include "SerializableRealVector.h"
+#include "Utils.h"
 
 
 
@@ -68,7 +70,7 @@ void send(void* data, size_t numBytes)
 void receive(void* buffer, size_t numBytes)
 {
    int fd_read = open(to_server_fifo_name, O_RDONLY);
-   read(fd_read, buffer, sizeof(Request));
+   read(fd_read, buffer, numBytes);
    close(fd_read);
 }
 
@@ -94,7 +96,7 @@ int main()
 /// Comments
 {
 
-   std::map<std::string, std::string> store;
+   std::map<std::string, BinaryBlob*> store;
 
    // commented out code
    signal(SIGINT, handleSignal);
@@ -125,24 +127,23 @@ int main()
 
 
          /// Retrieve message
-         std::unique_ptr<char> msg(new char[request.getNumBytes()]);
-         receive(msg.get(), request.getNumBytes());
+         char* msg = new char[request.getNumBytes()];
+         receive(msg, request.getNumBytes());
 
-         std::string command(msg.get());
+         // std::cout << "Raw data received:" << std::endl;
+         // Utils::binaryDump(msg, request.getNumBytes());
+
+         BinaryBlob* blob = new BinaryBlob(msg, request.getNumBytes());
 
          std::cout << "Storing with key '" << key << "'" << std::endl;
-         store[key] = command;
+         store[key] = blob;
 
          std::cout << "Store contents: " << std::endl;
          for(auto it = store.begin();
              it != store.end(); ++it)
          {
-             std::cout << it->first << " " << it->second << std::endl;
+             std::cout << it->first << ": chunck of " << it->second->getSize() << std::endl;
          }
-
-         // std::string command(msg.get());
-         std::cout << "Received message: '" << command << "'" << std::endl;
-         std::string genResponse = to_upper(command);
       }
       else if (request.isRetrieveRequest())
       {
@@ -150,7 +151,7 @@ int main()
          for(auto it = store.begin();
              it != store.end(); ++it)
          {
-             std::cout << it->first.length() << ", " << it->first << ": " << it->second << std::endl;
+             std::cout << it->first << ": chunck of " << it->second->getSize() << std::endl;
          }
 
          auto key = request.getKey();
@@ -165,17 +166,17 @@ int main()
             continue;
          }
 
-         const std::string& message = store[key];
+         BinaryBlob* message = store[key];
 
-         sendObj<Response>(Response::announceMessage(message.length()));
+         sendObj<Response>(Response::announceMessage(message->getSize()));
 
          auto response = receiveObj<Response>();
          std::cout << "Received response: " << response << std::endl;
          if (response.getType() == Response::ACKNOWLEDGE)
          {
-            std::cout << "Sending: '" << message << "'" << std::endl;
+            std::cout << "Sending " << message->getSize() << " bytes..." << std::endl;
 
-            send(const_cast<char*>(message.c_str()), message.length());
+            send((void*)(message->getData()), message->getSize());
          }
          else
          {

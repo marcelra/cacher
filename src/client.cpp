@@ -8,9 +8,12 @@
 #include <chrono>
 #include <thread>
 #include <cassert>
+#include <vector>
 
 #include "Response.h"
 #include "Request.h"
+#include "SerializableRealVector.h"
+#include "Utils.h"
 
 
 
@@ -31,7 +34,7 @@ void send(void* data, size_t numBytes)
 void receive(void* buffer, size_t numBytes)
 {
    int fd_read = open(from_server_fifo_name, O_RDONLY);
-   read(fd_read, buffer, sizeof(Request));
+   read(fd_read, buffer, numBytes);
    close(fd_read);
 }
 
@@ -49,6 +52,18 @@ template<class T> T receiveObj()
    T obj;
    receive(&obj, sizeof(T));
    return obj;
+}
+
+
+
+std::vector<double> generateVector(size_t length)
+{
+   auto result = std::vector<double>(length);
+   for (size_t i = 0; i < length; ++i)
+   {
+      result[i] = i;
+   }
+   return result;
 }
 
 
@@ -71,10 +86,22 @@ int main()
          std::cout << "Key: " << std::endl;
          std::getline(std::cin, key);
 
-         std::cout << "Value: " << std::endl;
-         std::getline(std::cin, value);
+         int length = 0;
+         while (true)
+         {
+            std::cout << "Length of vector: " << std::endl;
+            std::getline(std::cin, value);
+            length = atoi(value.c_str());
 
-         auto request = Request::store(key, value.length());
+            if (length > 0)
+               break;
+         }
+
+         std::vector<double>&& vector = generateVector(length);
+         SerializableRealVector srv(vector);
+         BinaryBlob&& blob = srv.toBinaryBlob();
+
+         auto request = Request::store(key, blob.getSize());
          std::cout << "Sending request " << request << std::endl;
 
          /// Send request
@@ -87,7 +114,7 @@ int main()
          if (response.getType() == Response::ACKNOWLEDGE)
          {
             std::cout << "Sending data..." << std::endl;
-            send(const_cast<char*>(value.c_str()), value.length());
+            send((void*)(blob.getData()), blob.getSize());
          }
          else
          {
@@ -115,12 +142,17 @@ int main()
             std::cout << "Sending acknowledge..." << std::endl;
             sendObj<Response>(Response::responseAcknowledge());
 
-            char message[numBytes + 1];
+            char* message = new char[numBytes];
             receive(message, numBytes);
 
-            message[numBytes] = 0;
+            std::cout << "Message read, building blob" << std::endl;
+            BinaryBlob blob(message, numBytes);
+            SerializableRealVector srv(blob);
+            blob.clearData();
 
-            std::cout << "Received message: '" << std::string(message) << "'" << std::endl;
+            std::cout << "Received vector of size " << srv.vec.size()
+                      << " with last element '" << srv.vec.back() << "'" << std::endl;
+
          }
          else if (response.getType() == Response::KEY_NOT_FOUND)
          {
@@ -133,36 +165,5 @@ int main()
          }
 
       }
-
-      // auto request = Request::store(buf.length());
-      // fd_write = open(to_server_fifo_name, O_WRONLY);
-      // write(fd_write, &request, sizeof(request));
-
-      // Response response;
-      // fd_read = open(from_server_fifo_name, O_RDONLY);
-      // read(fd_read, &response, sizeof(response));
-      // close(fd_read);
-
-      // std::cout << "Response from server: " << response << std::endl;
-
-      // if (response.getType() == Response::ACKNOWLEDGE)
-      // {
-      //    fd_write = open(to_server_fifo_name, O_WRONLY);
-      //    write(fd_write, buf.c_str(), buf.length());
-      //    close(fd_write);
-      // }
-      // else
-      // {
-      //    assert(false);
-      // }
-
-
-      // char read_buf[1024];
-      // fd_read = open(from_server_fifo_name, O_RDONLY);
-      // read(fd_read, read_buf, 1024);
-      // close(fd_read);
-
-      // std::cout << "Server responded: " << std::endl;
-      // std::cout << read_buf << std::endl;
    }
 }

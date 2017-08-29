@@ -14,7 +14,8 @@ SOURCES += \
     src/testsuite.cpp \
     src/SerializableRealVector.cpp \
     src/Request.cpp \
-    src/Response.cpp
+    src/Response.cpp \
+    src/Utils.cpp
 
 DISTFILES += \
     Makefile
@@ -24,6 +25,7 @@ HEADERS += \
     inc/TestSerializable.h \
     inc/SerializableRealVector.h \
     inc/Request.h \
-    inc/Response.h
+    inc/Response.h \
+    inc/Utils.h
 
 INCLUDEPATH += inc/

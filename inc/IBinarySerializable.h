@@ -10,10 +10,12 @@ class BinaryBlob
    public:
       BinaryBlob(size_t size);
       BinaryBlob(const BinaryBlob& other);
+      BinaryBlob(char* data, size_t size);
       ~BinaryBlob();
 
       BinaryBlob& operator=(const BinaryBlob& other);
 
+      size_t      getSize() const;
       const char* getData() const;
       char*       getData();
       void        clearData();
