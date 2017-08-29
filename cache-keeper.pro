@@ -15,7 +15,8 @@ SOURCES += \
     src/SerializableRealVector.cpp \
     src/Request.cpp \
     src/Response.cpp \
-    src/Utils.cpp
+    src/Utils.cpp \
+    src/FifoCommunicator.cpp
 
 DISTFILES += \
     Makefile
@@ -26,6 +27,7 @@ HEADERS += \
     inc/SerializableRealVector.h \
     inc/Request.h \
     inc/Response.h \
-    inc/Utils.h
+    inc/Utils.h \
+    inc/FifoCommunicator.h
 
 INCLUDEPATH += inc/

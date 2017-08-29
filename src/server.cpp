@@ -15,52 +15,27 @@
 #include "Response.h"
 #include "SerializableRealVector.h"
 #include "Utils.h"
+#include "FifoCommunicator.h"
 
 
 
-const char* to_server_fifo_name = "/tmp/to_server";
-const char* from_server_fifo_name = "/tmp/from_server";
-
-
-
-std::string to_upper(const std::string& str) {
-   std::string result = str;
-
-   for (size_t i = 0; i < str.size(); ++i) {
-      result[i] = std::toupper(str[i]);
-   }
-
-   return result;
-}
-
-
-
-void startup() {
-   std::cout << "Starting server..." << std::endl;
-   mkfifo(to_server_fifo_name, 0666);
-   mkfifo(from_server_fifo_name, 0666);
-}
-
-
-
-void shutdown() {
-   std::cout << "Shutdown server..." << std::endl;
-   unlink(to_server_fifo_name);
-   unlink(from_server_fifo_name);
-   exit(0);
-}
+const char* toServerFifoName = "/tmp/to_server";
+const char* fromServerFifoName = "/tmp/from_server";
 
 
 
 void handleSignal(int) {
-   shutdown();
+   std::cout << "Shutdown server..." << std::endl;
+   unlink(toServerFifoName);
+   unlink(fromServerFifoName);
+   exit(0);
 }
 
 
 
 void send(void* data, size_t numBytes)
 {
-   int fd_write = open(from_server_fifo_name, O_WRONLY);
+   int fd_write = open(fromServerFifoName, O_WRONLY);
    write(fd_write, data, numBytes);
    close(fd_write);
 }
@@ -69,7 +44,7 @@ void send(void* data, size_t numBytes)
 
 void receive(void* buffer, size_t numBytes)
 {
-   int fd_read = open(to_server_fifo_name, O_RDONLY);
+   int fd_read = open(toServerFifoName, O_RDONLY);
    read(fd_read, buffer, numBytes);
    close(fd_read);
 }
@@ -92,17 +67,140 @@ template<class T> T receiveObj()
 
 
 
+
+class Server : public FifoCommunicator
+{
+   public:
+      Server(const std::string& toServerFifoName, const std::string& fromServerFifoName);
+      ~Server();
+
+   public:
+      void run();
+
+   private:
+      void handleStoreRequest(const Request& request);
+      void handleRetrieveRequest(const Request& request);
+
+   private:
+      std::map<std::string, BinaryBlob*> m_store;
+};
+
+
+
+Server::Server(const std::string& toServerFifoName, const std::string& fromServerFifoName) :
+   FifoCommunicator(fromServerFifoName, toServerFifoName)
+{
+   signal(SIGINT, handleSignal);
+
+   mkfifo(toServerFifoName.c_str(), 0666);
+   mkfifo(fromServerFifoName.c_str(), 0666);
+}
+
+
+
+Server::~Server()
+{
+}
+
+
+
+void Server::run()
+{
+   while (true)
+   {
+      std::cout << "INFO: in main loop... Waiting for request." << std::endl;
+
+      std::unique_ptr<Request> request(receiveObj<Request>());
+
+      if (request->isStoreRequest())
+      {
+         handleStoreRequest(*request);
+      }
+      else if (request->isRetrieveRequest())
+      {
+         handleRetrieveRequest(*request);
+      }
+      else
+      {
+         std::cout << "Server::run(): error 1" << std::endl;
+      }
+   }
+}
+
+
+
+void Server::handleStoreRequest(const Request& request)
+{
+   std::cout << "INFO: in handleStoreRequest()..." << std::endl;
+
+   auto key = request.getKey();
+
+   std::cout << "Key = '" << key << "'" << std::endl;
+
+   /// Acknowledge
+   sendObj<Response>(Response::responseAcknowledge());
+
+   /// Receive blob
+   BinaryBlob* blob = receiveBinaryBlob(request.getNumBytes());
+
+   /// Store blob
+   m_store[key] = blob;
+}
+
+
+
+void Server::handleRetrieveRequest(const Request& request)
+{
+   std::cout << "INFO: in handleRetrieveRequest()..." << std::endl;
+
+   /// Get blob
+   auto key = request.getKey();
+   if (m_store.find(key) == m_store.end())
+   {
+      std::cout << "WARNING: Key not found." << std::endl;
+      sendObj<Response>(Response::keyNotFound());
+      return;
+   }
+   BinaryBlob* blob = m_store[key];
+
+   /// Announce how many bytes will be send
+   sendObj<Response>(Response::announceMessage(blob->getSize()));
+
+   /// Wait for acknowledgement
+   std::unique_ptr<Response> response(receiveObj<Response>());
+   if (response->getType() != Response::ACKNOWLEDGE)
+   {
+      std::cout << "WARNING: No acknowledgement received." << std::endl;
+      return;
+   }
+
+   /// Send blob
+   sendBinaryBlob(*blob);
+}
+
+
+
 int main()
 /// Comments
 {
 
+   Server server(toServerFifoName, fromServerFifoName);
+   server.run();
+
+   return 0;
+}
+
+
+
+int oldMain()
+{
    std::map<std::string, BinaryBlob*> store;
 
    // commented out code
    signal(SIGINT, handleSignal);
 
-   mkfifo(to_server_fifo_name, 0666);
-   mkfifo(from_server_fifo_name, 0666);
+   mkfifo(toServerFifoName, 0666);
+   mkfifo(fromServerFifoName, 0666);
 
    int fd_read;
    int fd_write;
@@ -180,7 +278,7 @@ int main()
          }
          else
          {
-            std::cout << "Not sending data!" << std::endl;
+            std::cout << "No acknowledge received!" << std::endl;
          }
       }
       else

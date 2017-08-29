@@ -17,14 +17,14 @@
 
 
 
-const char* to_server_fifo_name   = "/tmp/to_server";
-const char* from_server_fifo_name = "/tmp/from_server";
+const char* toServerFifoName   = "/tmp/to_server";
+const char* fromServerFifoName = "/tmp/from_server";
 
 
 
 void send(void* data, size_t numBytes)
 {
-   int fd_write = open(to_server_fifo_name, O_WRONLY);
+   int fd_write = open(toServerFifoName, O_WRONLY);
    write(fd_write, data, numBytes);
    close(fd_write);
 }
@@ -33,7 +33,7 @@ void send(void* data, size_t numBytes)
 
 void receive(void* buffer, size_t numBytes)
 {
-   int fd_read = open(from_server_fifo_name, O_RDONLY);
+   int fd_read = open(fromServerFifoName, O_RDONLY);
    read(fd_read, buffer, numBytes);
    close(fd_read);
 }

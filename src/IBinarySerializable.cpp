@@ -27,6 +27,7 @@ BinaryBlob::BinaryBlob(char* data, size_t size) :
 
 BinaryBlob::~BinaryBlob()
 {
+   delete[] m_ptr;
 }
 
 
@@ -63,7 +64,6 @@ const char* BinaryBlob::getData() const
 
 void BinaryBlob::clearData()
 {
-   delete[] m_ptr;
-   m_ptr = 0;
+   std::cout << "Depcrecated function clearData called..." << std::endl;
 }
 
