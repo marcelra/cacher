@@ -1,0 +1,34 @@
+
+MyObject object.process(parameters);
+
+object.bladiebla
+
+
+class MyObject : public AutoCacheProcessor
+{
+   void process(parameters, dependencies)
+   {
+      useCache = check(dependencies, parameters, retention, serverUp);
+      if useCache -> return cache
+         result = processImpl();
+      else storeToCache(result, ...)
+   }
+
+   void processImpl(parameters)
+   {
+      /// calculate based on parameters
+      return result;
+   }
+};
+
+
+depends on:
+   scalar-like parameters, 
+   timestamps of other cached objects
+   retention
+   code (?), git revision (stored diff for source files, - have to supply source files), code version bump
+
+
+
+process
+

@@ -3,7 +3,7 @@
 
 
 CC=g++
-DBGFLAGS=-O0 -g
+DBGFLAGS=-O3 -g
 LIB=
 
 OBJDIR=obj
