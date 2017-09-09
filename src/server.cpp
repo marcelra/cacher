@@ -57,6 +57,10 @@ class Server : public FifoCommunicator
        */
       ~Server();
 
+   private:
+      Server(const Server& other);
+      Server& operator=(const Server& other);
+
    public:
       /**
        * Run server. Blocking call.

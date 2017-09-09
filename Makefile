@@ -3,7 +3,7 @@
 
 
 CC=g++
-DBGFLAGS=-O3 -g
+DBGFLAGS=-O0 -g
 LIB=
 
 OBJDIR=obj
@@ -23,11 +23,13 @@ LIB_OBJ=IBinarySerializable.o \
         Request.o \
         Response.o \
         Utils.o \
-        FifoCommunicator.o
+        FifoCommunicator.o \
+        Exceptions.o
 
-_OBJ_SERVER=server.o Request.o Response.o SerializableRealVector.o IBinarySerializable.o Utils.o FifoCommunicator.o
-_OBJ_CLIENT=client.o Request.o Response.o SerializableRealVector.o IBinarySerializable.o Utils.o FifoCommunicator.o
-_OBJ_TESTSUITE=testsuite.o IBinarySerializable.o TestSerializable.o SerializableRealVector.o Request.o Response.o Utils.o FifoCommunicator.o
+
+_OBJ_SERVER=server.o Request.o Response.o SerializableRealVector.o IBinarySerializable.o Utils.o FifoCommunicator.o Exceptions.o
+_OBJ_CLIENT=client.o Request.o Response.o SerializableRealVector.o IBinarySerializable.o Utils.o FifoCommunicator.o Exceptions.o
+_OBJ_TESTSUITE=testsuite.o IBinarySerializable.o TestSerializable.o SerializableRealVector.o Request.o Response.o Utils.o FifoCommunicator.o Exceptions.o
 
 OBJ_SERVER=$(patsubst %,$(OBJDIR)/%,$(_OBJ_SERVER))
 OBJ_CLIENT=$(patsubst %,$(OBJDIR)/%,$(_OBJ_CLIENT))

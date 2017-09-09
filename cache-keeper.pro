@@ -16,7 +16,8 @@ SOURCES += \
     src/Request.cpp \
     src/Response.cpp \
     src/Utils.cpp \
-    src/FifoCommunicator.cpp
+    src/FifoCommunicator.cpp \
+    src/Exceptions.cpp
 
 DISTFILES += \
     Makefile
@@ -28,6 +29,7 @@ HEADERS += \
     inc/Request.h \
     inc/Response.h \
     inc/Utils.h \
-    inc/FifoCommunicator.h
+    inc/FifoCommunicator.h \
+    inc/Exceptions.h
 
 INCLUDEPATH += inc/

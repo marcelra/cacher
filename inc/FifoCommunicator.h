@@ -12,7 +12,13 @@ class FifoCommunicator
 {
    public:
       FifoCommunicator(const std::string& sendFifo, const std::string& receiveFifo);
+      virtual ~FifoCommunicator() {}
 
+   private:
+      FifoCommunicator(const FifoCommunicator& other);
+      FifoCommunicator& operator=(const FifoCommunicator& other);
+
+   public:
       void send(const char* data, size_t numBytes);
       char* receive(size_t numBytes);
 
