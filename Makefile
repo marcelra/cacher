@@ -24,7 +24,10 @@ LIB_OBJ=IBinarySerializable.o \
         Response.o \
         Utils.o \
         FifoCommunicator.o \
-        Exceptions.o
+        Exceptions.o \
+        DummyAlgorithm.o \
+        DependencyListBase.o \
+        Parameter.o
 
 
 _OBJ_SERVER=server.o $(LIB_OBJ)

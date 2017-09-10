@@ -9,6 +9,7 @@
 class SerializableRealVector : public IBinarySerializable
 {
    public:
+      SerializableRealVector();
       SerializableRealVector(const BinaryBlob& blob);
       SerializableRealVector(const std::vector<double>& vector);
 

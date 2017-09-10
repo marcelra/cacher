@@ -17,7 +17,11 @@ SOURCES += \
     src/Response.cpp \
     src/Utils.cpp \
     src/FifoCommunicator.cpp \
-    src/Exceptions.cpp
+    src/Exceptions.cpp \
+    src/DummyAlgorithm.cpp \
+    src/DependencyListBase.cpp \
+    src/CacheableBase.cpp \
+    src/Parameter.cpp
 
 DISTFILES += \
     Makefile
@@ -30,6 +34,13 @@ HEADERS += \
     inc/Response.h \
     inc/Utils.h \
     inc/FifoCommunicator.h \
-    inc/Exceptions.h
+    inc/Exceptions.h \
+    inc/IAlgorithm.h \
+    inc/DummyAlgorithm.h \
+    inc/IIdentifiable.h \
+    inc/DependencyListBase.h \
+    inc/IComparable.h \
+    inc/Parameter.h \
+    inc/CacheableBase.h
 
 INCLUDEPATH += inc/

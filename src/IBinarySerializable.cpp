@@ -1,6 +1,7 @@
 #include "IBinarySerializable.h"
 
 #include <iostream>
+#include <string.h>
 
 
 BinaryBlob::BinaryBlob(size_t size) :
@@ -18,10 +19,12 @@ BinaryBlob::BinaryBlob(const BinaryBlob& other)
 
 
 
-BinaryBlob::BinaryBlob(char* data, size_t size) :
+BinaryBlob::BinaryBlob(const char* data, size_t size) :
    m_size(size),
-   m_ptr(data)
-{}
+   m_ptr(new char[size])
+{
+   memcpy(m_ptr, data, size);
+}
 
 
 
@@ -58,6 +61,22 @@ char* BinaryBlob::getData()
 const char* BinaryBlob::getData() const
 {
    return m_ptr;
+}
+
+
+void BinaryBlob::append(const char* data, size_t numBytes)
+{
+   size_t oldSize = m_size;
+   m_ptr = static_cast<char*>(realloc(m_ptr, m_size + numBytes));
+   m_size += numBytes;
+   memcpy(m_ptr + oldSize, data, numBytes);
+}
+
+
+
+void BinaryBlob::append(const BinaryBlob& other)
+{
+   append(other.getData(), other.getSize());
 }
 
 

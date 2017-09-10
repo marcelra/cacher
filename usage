@@ -32,3 +32,70 @@ depends on:
 
 process
 
+class IIdentifyable 
+{
+   size_t getId();
+}
+
+
+
+LazyCacheAble : public IIdentifyable, public ISerializable
+{
+   CacheAble(std::string& name);
+   store(dependencies);
+   CacheAble* retrieve(depedencies);
+}
+
+
+
+class DependencyListBase : public Serializable
+{
+   public:
+      DependencyListBase(IAlgorithm* alg)
+
+      getIdCached();
+}
+
+
+class IAlgorithm
+{
+   std::string getName();
+}
+
+
+class Algorithm1 : public Algorithm
+{
+   public:
+      class DependencyList : public IDepedencyList
+      {
+         DepedencyList(Parameter<int> a, Parameter<double> b, IIdentifyable& c) 
+         {
+            addDependency(a);
+            addDependency(b);
+            addDependency(c);
+         }
+      }
+
+
+      Algorithm1(const DependencyList& depList)
+         Algorithm(depList)
+      {
+      }
+
+      Algorithm1.executeImpl()
+      {
+         ...
+      }
+};
+
+
+Result2 = calculation2(DependencyList(0.5, 3, calculation1)).execute()
+
+
+Calcalator1 calculation1(Parameter<double> par1, Parameter<int> par2, retention=);
+
+
+result = calculation1(0.2, 3).execute()
+
+
+

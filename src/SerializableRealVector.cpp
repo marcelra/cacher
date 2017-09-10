@@ -5,6 +5,12 @@
 
 
 
+SerializableRealVector::SerializableRealVector() :
+   vec()
+{}
+
+
+
 SerializableRealVector::SerializableRealVector(const BinaryBlob& blob) :
    vec()
 {

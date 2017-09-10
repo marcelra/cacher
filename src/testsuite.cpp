@@ -4,6 +4,10 @@
 #include "SerializableRealVector.h"
 #include "Request.h"
 #include "Response.h"
+#include "Parameter.h"
+#include "DependencyListBase.h"
+#include "DummyAlgorithm.h"
+#include "CacheableBase.h"
 
 #include <thread>
 #include <chrono>
@@ -67,6 +71,7 @@ bool testSerializableRealVector(size_t n)
    blob.clearData();
    std::cout << "After clearing data" << std::endl;
    std::this_thread::sleep_for(std::chrono::seconds(5));
+   return true;
 }
 
 
@@ -95,6 +100,72 @@ bool testRequest()
       auto response = Response::announceMessage(128);
       std::cout << response << std::endl;
    }
+   return true;
+}
+
+
+
+bool testParameter()
+{
+   Parameter<int> par1(42);
+   Parameter<int> par2(42);
+
+   std::cout << "par1 == par2: " << (par1 == par2) << std::endl;
+
+   Parameter<int> par3(43);
+
+   std::cout << "par1 == par3: " << (par1 == par3) << std::endl;
+
+
+   Parameter<std::string> par4("hoi");
+   BinaryBlob blob = par4.toBinaryBlob();
+   Parameter<std::string> par5(blob);
+
+   std::cout << "par4 == par5: " << (par4 == par5) << std::endl;
+
+
+   return true;
+}
+
+
+
+bool testDependencyListBase()
+{
+   DummyAlgorithm alg("Dummy", DummyAlgorithm::DependencyList(42, 33));
+   DependencyListBase depList1;
+   depList1.addDependency(Parameter<int>(42));
+   depList1.addDependency(Parameter<int>(33));
+
+   DependencyListBase depList2;
+   depList2.addDependency(Parameter<int>(42));
+   depList2.addDependency(Parameter<int>(33));
+
+   std::cout << "depList1 == depList2: " << (depList1 == depList2) << std::endl;
+
+   DependencyListBase depList3;
+   depList2.addDependency(Parameter<int>(2));
+   depList2.addDependency(Parameter<int>(33));
+
+   std::cout << "depList1 == depList3: " << (depList1 == depList3) << std::endl;
+
+   return true;
+}
+
+
+
+bool testDummyAlg()
+{
+   DummyAlgorithm alg("dummy", DummyAlgorithm::DependencyList(42, 3));
+
+
+   return true;
+}
+
+
+bool testCacheableBase()
+{
+   CacheableBase<SerializableRealVector> x;
+   return true;
 }
 
 
@@ -105,7 +176,12 @@ int main()
    // testSerializable();
    // testSerializableRealVector(20000000000/16);
 
-   testRequest();
+   // testRequest();
+   testParameter();
+
+   // testDependencyListBase();
+   // testCacheableBase();
+   // testDummyAlg();
 
 
 
