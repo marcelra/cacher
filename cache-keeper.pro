@@ -21,7 +21,8 @@ SOURCES += \
     src/DummyAlgorithm.cpp \
     src/DependencyListBase.cpp \
     src/CacheableBase.cpp \
-    src/Parameter.cpp
+    src/Parameter.cpp \
+    src/BinaryBlob.cpp
 
 DISTFILES += \
     Makefile
@@ -41,6 +42,7 @@ HEADERS += \
     inc/DependencyListBase.h \
     inc/IComparable.h \
     inc/Parameter.h \
-    inc/CacheableBase.h
+    inc/CacheableBase.h \
+    inc/BinaryBlob.h
 
 INCLUDEPATH += inc/

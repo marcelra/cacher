@@ -3,30 +3,7 @@
 
 #include <stddef.h>
 
-
-
-class BinaryBlob
-{
-   public:
-      BinaryBlob(size_t size = 0);
-      BinaryBlob(const BinaryBlob& other);
-      BinaryBlob(const char* data, size_t size);
-      ~BinaryBlob();
-
-      BinaryBlob& operator=(const BinaryBlob& other);
-
-      size_t      getSize() const;
-      const char* getData() const;
-      char*       getData();
-      void        clearData();
-
-      void append(const char* data, size_t numBytes);
-      void append(const BinaryBlob& other);
-
-   private:
-      char*    m_ptr;
-      size_t   m_size;
-};
+#include "BinaryBlob.h"
 
 
 

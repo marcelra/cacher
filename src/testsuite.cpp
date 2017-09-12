@@ -169,6 +169,42 @@ bool testCacheableBase()
 }
 
 
+bool testBinaryBlob()
+{
+   NewBlob::BinaryBlob blob;
+
+   const size_t len = 25;
+   std::vector<size_t> vec(len);
+
+   for (size_t i = 0; i < vec.size(); ++i)
+   {
+      vec[i] = i*i;
+   }
+
+   blob << len;
+   for (size_t i = 0; i < vec.size(); ++i)
+   {
+      blob << vec[i];
+   }
+
+   size_t len2;
+   blob >> len2;
+   std::vector<size_t> vec2(len2);
+   for (size_t i = 0; i < vec2.size(); ++i)
+   {
+      blob >> vec2[i];
+   }
+
+   for (size_t i = 0; i < vec2.size(); ++i)
+   {
+      std::cout << vec2[i] << std::endl;
+   }
+
+
+   return true;
+}
+
+
 
 int main()
 {
@@ -177,11 +213,13 @@ int main()
    // testSerializableRealVector(20000000000/16);
 
    // testRequest();
-   testParameter();
+   // testParameter();
 
    // testDependencyListBase();
    // testCacheableBase();
    // testDummyAlg();
+
+   testBinaryBlob();
 
 
 

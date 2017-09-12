@@ -27,7 +27,8 @@ LIB_OBJ=IBinarySerializable.o \
         Exceptions.o \
         DummyAlgorithm.o \
         DependencyListBase.o \
-        Parameter.o
+        Parameter.o \
+        BinaryBlob.o
 
 
 _OBJ_SERVER=server.o $(LIB_OBJ)
