@@ -158,7 +158,7 @@ void Client::interactiveRetrieve()
 
    try
    {
-      SerializableRealVector&& srv = retrieve<SerializableRealVector>(key);
+      SerializableRealVector srv = retrieve<SerializableRealVector>(key);
 
       std::cout << "Received vector of size " << srv.vec.size()
                 << " with last element '" << srv.vec.back() << "'" << std::endl;

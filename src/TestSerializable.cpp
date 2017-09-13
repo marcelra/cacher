@@ -12,19 +12,16 @@ TestSerializable::TestSerializable() :
 
 BinaryBlob TestSerializable::toBinaryBlob() const
 {
-   size_t size = sizeof(TestSerializable);
-   BinaryBlob blob(size);
-   // char** tmp = &(blob.getData());
-   memcpy(blob.getData(), this, size);
-   // return BinaryBlob(new TestSerializable(*this), sizeof(TestSerializable));
+   BinaryBlob blob;
+   blob << m_integer;
    return blob;
 }
 
 
 
-void TestSerializable::fromBinaryBlob(const BinaryBlob& blob)
+void TestSerializable::fromBinaryBlob(BinaryBlob& blob)
 {
-   *this = TestSerializable(*reinterpret_cast<const TestSerializable*>(blob.getData()));
+   blob >> m_integer;
 }
 
 

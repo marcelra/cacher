@@ -34,7 +34,7 @@ class DependencyListBase : public IBinarySerializable, public IComparable
 
    public:
       BinaryBlob toBinaryBlob() const;
-      void fromBinaryBlob(const BinaryBlob& blob);
+      void fromBinaryBlob(BinaryBlob& blob);
 
    public:
       DependencyListBase& addDependency(const IComparable& dependency);

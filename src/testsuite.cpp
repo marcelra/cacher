@@ -25,7 +25,6 @@ bool testSerializable()
 
    std::cout << ts2.getData() << std::endl;
 
-   blob.clearData();
    return true;
 }
 
@@ -68,7 +67,6 @@ bool testSerializableRealVector(size_t n)
    //     std::cout << srv2.vec[i] << ", ";
    // }
    // std::cout << std::endl;
-   blob.clearData();
    std::cout << "After clearing data" << std::endl;
    std::this_thread::sleep_for(std::chrono::seconds(5));
    return true;
@@ -171,7 +169,7 @@ bool testCacheableBase()
 
 bool testBinaryBlob()
 {
-   NewBlob::BinaryBlob blob;
+   BinaryBlob blob;
 
    const size_t len = 25;
    std::vector<size_t> vec(len);

@@ -14,7 +14,7 @@ class IBinarySerializable
 
    public:
       virtual BinaryBlob toBinaryBlob() const = 0;
-      virtual void fromBinaryBlob(const BinaryBlob& blob) = 0;
+      virtual void fromBinaryBlob(BinaryBlob& blob) = 0;
 
    public:
       static bool derivesFromIBinarySerializable() { return true; }

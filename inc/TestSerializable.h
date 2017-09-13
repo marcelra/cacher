@@ -9,7 +9,7 @@ class TestSerializable : public IBinarySerializable
       TestSerializable();
 
       BinaryBlob toBinaryBlob() const;
-      void fromBinaryBlob(const BinaryBlob& blob);
+      void fromBinaryBlob(BinaryBlob& blob);
 
       int getData() const;
       void setData(int value);

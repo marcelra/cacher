@@ -13,21 +13,17 @@ class Parameter : public IComparable, public IBinarySerializable
 {
    public:
       Parameter(const T& value);
-      Parameter(const BinaryBlob& blob);
+      Parameter(BinaryBlob& blob);
 
       bool operator==(const IComparable& other) const;
 
    public:
       BinaryBlob toBinaryBlob() const;
-      void fromBinaryBlob(const BinaryBlob& blob);
+      void fromBinaryBlob(BinaryBlob& blob);
 
    private:
       T  m_value;
 };
-
-
-template<> BinaryBlob Parameter<std::string>::toBinaryBlob() const;
-template<> void Parameter<std::string>::fromBinaryBlob(const BinaryBlob& blob);
 
 
 template<class T>
@@ -38,7 +34,7 @@ Parameter<T>::Parameter(const T& value) :
 
 
 template<class T>
-Parameter<T>::Parameter(const BinaryBlob& blob)
+Parameter<T>::Parameter(BinaryBlob& blob)
 {
    fromBinaryBlob(blob);
 }
@@ -62,16 +58,16 @@ bool Parameter<T>::operator==(const IComparable& other) const
 template<class T>
 BinaryBlob Parameter<T>::toBinaryBlob() const
 {
-   BinaryBlob blob(reinterpret_cast<const char*>(&m_value), sizeof(T));
+   BinaryBlob blob;
+   blob << m_value;
    return blob;
 }
 
 
 template<class T>
-void Parameter<T>::fromBinaryBlob(const BinaryBlob& blob)
+void Parameter<T>::fromBinaryBlob(BinaryBlob& blob)
 {
-   assert(blob.getSize() == sizeof(T));
-   m_value = *blob.getData();
+   blob >> m_value;
 }
 
 

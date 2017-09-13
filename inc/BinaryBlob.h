@@ -6,22 +6,22 @@
 #include <vector>
 #include <cassert>
 
-namespace NewBlob
-{
 
 class BinaryBlob
 {
    public:
 
       BinaryBlob();
+      BinaryBlob(char* data, size_t size);
       virtual ~BinaryBlob();
 
    private:
-      BinaryBlob(const BinaryBlob& other);
+      // BinaryBlob(const BinaryBlob& other);
       BinaryBlob& operator=(const BinaryBlob& other);
 
    public:
-      size_t getSize();
+      size_t getSize() const;
+      const char* getData() const;
       void resetReadCursor();
 
       template <class T> BinaryBlob& operator<<(const T& x);
@@ -31,14 +31,14 @@ class BinaryBlob
       template <class T> BinaryBlob& operator>>(std::vector<T>& x);
 
    private:
-      void grow();
+      void grow(size_t numBytes);
       void growIfNeeded(size_t numBytesToBeAdded);
 
    private:
-      char*       m_ptr;
-      size_t      m_bytesAlloc;
-      char*       m_writePtr;
-      char*       m_readPtr;
+      char*          m_ptr;
+      size_t         m_bytesAlloc;
+      char*          m_writePtr;
+      char*          m_readPtr;
 
       static const size_t s_initSize;
 };
@@ -91,38 +91,15 @@ BinaryBlob& BinaryBlob::operator>>(std::vector<T>& x)
    size_t len;
    *this >> len;
 
-   assert( (m_readPtr + len) <= m_writePtr);
-   x.insert(x.end(), m_readPtr, m_readPtr + len);
-   m_readPtr += len;
+   const auto readEnd = m_readPtr + len * sizeof(T);
+
+   assert( readEnd <= m_writePtr);
+   x.insert(x.end(), reinterpret_cast<T*>(m_readPtr), reinterpret_cast<T*>(readEnd));
+   m_readPtr = readEnd;
 
    return *this;
 }
 
-} /// namespace NewBlob
-
-
-class BinaryBlob
-{
-   public:
-      BinaryBlob(size_t size = 0);
-      BinaryBlob(const BinaryBlob& other);
-      BinaryBlob(const char* data, size_t size);
-      ~BinaryBlob();
-
-      BinaryBlob& operator=(const BinaryBlob& other);
-
-      size_t      getSize() const;
-      const char* getData() const;
-      char*       getData();
-      void        clearData();
-
-      void append(const char* data, size_t numBytes);
-      void append(const BinaryBlob& other);
-
-   private:
-      char*    m_ptr;
-      size_t   m_size;
-};
 
 
 
