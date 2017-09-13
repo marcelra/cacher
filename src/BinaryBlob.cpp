@@ -36,8 +36,8 @@ void BinaryBlob::grow()
 {
    m_bytesAlloc *= 2;
 
-   size_t writeOffset = m_writePtr - m_ptr;
-   size_t readOffset = m_readPtr - m_ptr;
+   const size_t writeOffset = m_writePtr - m_ptr;
+   const size_t readOffset = m_readPtr - m_ptr;
 
    m_ptr = static_cast<char*>(realloc(m_ptr, m_bytesAlloc));
 
@@ -45,22 +45,58 @@ void BinaryBlob::grow()
    m_readPtr = m_ptr + readOffset;
 }
 
-BinaryBlob& BinaryBlob::operator<<(size_t x)
+template <>
+BinaryBlob& BinaryBlob::operator<<(const std::string& x)
 {
-   growIfNeeded(sizeof(size_t));
+   *this << static_cast<size_t>(x.length());
 
-   memcpy(m_writePtr, &x, sizeof(size_t));
-   m_writePtr += sizeof(size_t);
+   const auto writeEnd = m_writePtr + x.length() * sizeof(char);
+
+   growIfNeeded(x.length());
+   memcpy(m_writePtr, x.c_str(), x.length() * sizeof(char));
+   m_writePtr = writeEnd;
 
    return *this;
 }
 
-BinaryBlob& BinaryBlob::operator>>(size_t& x)
+template <>
+BinaryBlob& BinaryBlob::operator>>(std::string& x)
 {
-   memcpy(&x, m_readPtr, sizeof(size_t));
-   m_readPtr += sizeof(size_t);
+   size_t len;
+   *this >> len;
+
+   const auto readEnd = m_readPtr + len;
+   assert( readEnd <= m_writePtr);
+
+   x.append(std::string(m_readPtr, readEnd));
+   m_readPtr = readEnd;
+
    return *this;
 }
+
+void BinaryBlob::resetReadCursor()
+{
+   m_readPtr = m_ptr;
+}
+
+// BinaryBlob& BinaryBlob::operator<<(size_t x)
+// {
+//    write(x);
+//    return *this;
+// }
+
+// BinaryBlob& BinaryBlob::operator<<(int x)
+// {
+//
+// }
+
+
+// BinaryBlob& BinaryBlob::operator>>(size_t& x)
+// {
+//    read(x);
+//    return *this;
+// }
+
 
 } /// namespace NewBlob
 

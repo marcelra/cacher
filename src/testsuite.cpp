@@ -181,11 +181,15 @@ bool testBinaryBlob()
       vec[i] = i*i;
    }
 
-   blob << len;
-   for (size_t i = 0; i < vec.size(); ++i)
-   {
-      blob << vec[i];
-   }
+   // blob << len;
+   // for (size_t i = 0; i < vec.size(); ++i)
+   // {
+   //    blob << vec[i];
+   // }
+   blob << vec;
+
+
+   blob << std::string("hoi");
 
    size_t len2;
    blob >> len2;
@@ -199,6 +203,14 @@ bool testBinaryBlob()
    {
       std::cout << vec2[i] << std::endl;
    }
+
+   std::string str;
+   blob >> str;
+
+   std::cout << str << std::endl;
+
+
+
 
 
    return true;
