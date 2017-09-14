@@ -18,10 +18,12 @@ bool testSerializable()
 {
    TestSerializable ts;
    ts.setData(150);
-   BinaryBlob&& blob = ts.toBinaryBlob();
+   BinaryBlob blob;
+
+   ts.streamToBlob(blob);
 
    TestSerializable ts2;
-   ts2.fromBinaryBlob(blob);
+   ts2.initFromBlob(blob);
 
    std::cout << ts2.getData() << std::endl;
 
@@ -37,38 +39,19 @@ bool testSerializableRealVector(size_t n)
    {
       (*vec)[i] = i*16;
    }
-   std::cout << "After creating vector" << std::endl;
-   std::this_thread::sleep_for(std::chrono::seconds(5));
 
    SerializableRealVector* srv = new SerializableRealVector(*vec);
-   std::cout << "After creating serializable vector" << std::endl;
-   std::this_thread::sleep_for(std::chrono::seconds(5));
-
    delete vec;
-   std::cout << "After removing vector" << std::endl;
-   std::this_thread::sleep_for(std::chrono::seconds(5));
 
-   BinaryBlob&& blob = srv->toBinaryBlob();
-   std::cout << "After creating blob" << std::endl;
-   std::this_thread::sleep_for(std::chrono::seconds(5));
+   BinaryBlob blob;
+   blob << *srv;
+   // srv->streamToBlob(blob);
 
    delete srv;
-   std::cout << "After deleting original vector" << std::endl;
-   std::this_thread::sleep_for(std::chrono::seconds(5));
 
    SerializableRealVector srv2(blob);
-   std::cout << "After creating 2nd vector" << std::endl;
-   std::this_thread::sleep_for(std::chrono::seconds(5));
 
    std::cout << srv2.vec.back() << std::endl;
-
-   // for (size_t i=0; i<srv2.vec.size(); ++i)
-   // {
-   //     std::cout << srv2.vec[i] << ", ";
-   // }
-   // std::cout << std::endl;
-   std::cout << "After clearing data" << std::endl;
-   std::this_thread::sleep_for(std::chrono::seconds(5));
    return true;
 }
 
@@ -116,7 +99,8 @@ bool testParameter()
 
 
    Parameter<std::string> par4("hoi");
-   BinaryBlob blob = par4.toBinaryBlob();
+   BinaryBlob blob;
+   blob << par4;
    Parameter<std::string> par5(blob);
 
    std::cout << "par4 == par5: " << (par4 == par5) << std::endl;
@@ -219,15 +203,15 @@ bool testBinaryBlob()
 int main()
 {
 
-   // testSerializable();
-   // testSerializableRealVector(20000000000/16);
+   testSerializable();
+   testSerializableRealVector(1e6);
 
-   // testRequest();
-   // testParameter();
+   testRequest();
+   testParameter();
 
-   // testDependencyListBase();
-   // testCacheableBase();
-   // testDummyAlg();
+   testDependencyListBase();
+   testCacheableBase();
+   testDummyAlg();
 
    testBinaryBlob();
 

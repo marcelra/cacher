@@ -45,7 +45,7 @@ void DependencyListBase::setName(const std::string& name)
 }
 
 
-BinaryBlob DependencyListBase::toBinaryBlob() const
+void DependencyListBase::streamToBlob(BinaryBlob& blob) const
 {
    assert(false);
 //    BinaryBlob blob(0);
@@ -86,7 +86,7 @@ BinaryBlob DependencyListBase::toBinaryBlob() const
 }
 
 
-void DependencyListBase::fromBinaryBlob(BinaryBlob& blob)
+void DependencyListBase::initFromBlob(BinaryBlob& blob)
 {
    assert(false);
 }

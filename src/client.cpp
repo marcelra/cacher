@@ -16,6 +16,7 @@
 #include "FifoCommunicator.h"
 #include "Utils.h"
 #include "Exceptions.h"
+#include "BinaryBlob.h"
 
 
 const char* toServerFifoName   = "/tmp/to_server";
@@ -48,7 +49,8 @@ class Client : public FifoCommunicator
 
 void Client::store(const IBinarySerializable& object, const std::string& key)
 {
-   BinaryBlob&& blob = object.toBinaryBlob();
+   BinaryBlob blob;
+   object.streamToBlob(blob);
 
    Request request = Request::store(key, blob.getSize());
    std::cout << "Sending request " << request << std::endl;

@@ -3,6 +3,7 @@
 
 #include "IComparable.h"
 #include "IBinarySerializable.h"
+#include "BinaryBlob.h"
 
 #include <iostream>
 #include <string.h>
@@ -18,8 +19,8 @@ class Parameter : public IComparable, public IBinarySerializable
       bool operator==(const IComparable& other) const;
 
    public:
-      BinaryBlob toBinaryBlob() const;
-      void fromBinaryBlob(BinaryBlob& blob);
+      void streamToBlob(BinaryBlob& blob) const;
+      void initFromBlob(BinaryBlob& blob);
 
    private:
       T  m_value;
@@ -36,7 +37,7 @@ Parameter<T>::Parameter(const T& value) :
 template<class T>
 Parameter<T>::Parameter(BinaryBlob& blob)
 {
-   fromBinaryBlob(blob);
+   initFromBlob(blob);
 }
 
 
@@ -56,16 +57,14 @@ bool Parameter<T>::operator==(const IComparable& other) const
 
 
 template<class T>
-BinaryBlob Parameter<T>::toBinaryBlob() const
+void Parameter<T>::streamToBlob(BinaryBlob& blob) const
 {
-   BinaryBlob blob;
    blob << m_value;
-   return blob;
 }
 
 
 template<class T>
-void Parameter<T>::fromBinaryBlob(BinaryBlob& blob)
+void Parameter<T>::initFromBlob(BinaryBlob& blob)
 {
    blob >> m_value;
 }

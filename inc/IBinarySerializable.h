@@ -3,9 +3,7 @@
 
 #include <stddef.h>
 
-#include "BinaryBlob.h"
-
-
+class BinaryBlob;
 
 class IBinarySerializable
 {
@@ -13,11 +11,12 @@ class IBinarySerializable
       virtual ~IBinarySerializable() {}
 
    public:
-      virtual BinaryBlob toBinaryBlob() const = 0;
-      virtual void fromBinaryBlob(BinaryBlob& blob) = 0;
+      virtual void streamToBlob(BinaryBlob& blob) const = 0;
+      virtual void initFromBlob(BinaryBlob& blob) = 0;
 
    public:
       static bool derivesFromIBinarySerializable() { return true; }
 };
+
 
 #endif // IBINARYSERIALIZER_H

@@ -1,4 +1,5 @@
 #include "BinaryBlob.h"
+#include "IBinarySerializable.h"
 
 #include <iostream>
 #include <math.h>
@@ -61,7 +62,6 @@ void BinaryBlob::grow(size_t numBytes)
    m_readPtr = m_ptr + readOffset;
 }
 
-template <>
 BinaryBlob& BinaryBlob::operator<<(const std::string& x)
 {
    *this << static_cast<size_t>(x.length());
@@ -75,7 +75,6 @@ BinaryBlob& BinaryBlob::operator<<(const std::string& x)
    return *this;
 }
 
-template <>
 BinaryBlob& BinaryBlob::operator>>(std::string& x)
 {
    size_t len;
@@ -90,26 +89,30 @@ BinaryBlob& BinaryBlob::operator>>(std::string& x)
    return *this;
 }
 
+BinaryBlob& BinaryBlob::operator<<(const IBinarySerializable& object)
+{
+   object.streamToBlob(*this);
+   return *this;
+}
+
+BinaryBlob& BinaryBlob::operator>>(IBinarySerializable& object)
+{
+   object.initFromBlob(*this);
+   return *this;
+}
+
+
 void BinaryBlob::resetReadCursor()
 {
    m_readPtr = m_ptr;
 }
 
-// BinaryBlob& BinaryBlob::operator<<(size_t x)
-// {
-//    write(x);
-//    return *this;
-// }
+BinaryBlob& BinaryBlob::operator<<(const size_t& x) { return writeScalar(x); }
+BinaryBlob& BinaryBlob::operator<<(const int& x) { return writeScalar(x); }
+BinaryBlob& BinaryBlob::operator<<(const double& x) { return writeScalar(x); }
 
-// BinaryBlob& BinaryBlob::operator<<(int x)
-// {
-//
-// }
+BinaryBlob& BinaryBlob::operator>>(size_t& x) { return readScalar(x); }
+BinaryBlob& BinaryBlob::operator>>(int& x) { return readScalar(x); }
+BinaryBlob& BinaryBlob::operator>>(double& x) { return readScalar(x); }
 
-
-// BinaryBlob& BinaryBlob::operator>>(size_t& x)
-// {
-//    read(x);
-//    return *this;
-// }
 

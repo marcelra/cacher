@@ -33,8 +33,8 @@ class DependencyListBase : public IBinarySerializable, public IComparable
       bool operator==(const IComparable& other) const;
 
    public:
-      BinaryBlob toBinaryBlob() const;
-      void fromBinaryBlob(BinaryBlob& blob);
+      void streamToBlob(BinaryBlob& blob) const;
+      void initFromBlob(BinaryBlob& blob);
 
    public:
       DependencyListBase& addDependency(const IComparable& dependency);

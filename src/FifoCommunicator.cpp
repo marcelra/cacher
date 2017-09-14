@@ -1,6 +1,7 @@
 #include "FifoCommunicator.h"
 
 #include "IBinarySerializable.h"
+#include "BinaryBlob.h"
 
 #include <fcntl.h>
 #include <sys/stat.h>

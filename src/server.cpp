@@ -16,6 +16,7 @@
 #include "SerializableRealVector.h"
 #include "Utils.h"
 #include "FifoCommunicator.h"
+#include "BinaryBlob.h"
 
 
 

@@ -6,6 +6,7 @@
 #include <vector>
 #include <cassert>
 
+#include "IBinarySerializable.h"
 
 class BinaryBlob
 {
@@ -24,13 +25,28 @@ class BinaryBlob
       const char* getData() const;
       void resetReadCursor();
 
-      template <class T> BinaryBlob& operator<<(const T& x);
-      template <class T> BinaryBlob& operator>>(T& x);
 
       template <class T> BinaryBlob& operator<<(const std::vector<T>& x);
       template <class T> BinaryBlob& operator>>(std::vector<T>& x);
 
+      BinaryBlob& operator<<(const std::string& object);
+      BinaryBlob& operator>>(std::string& object);
+
+      BinaryBlob& operator<<(const IBinarySerializable& object);
+      BinaryBlob& operator>>(IBinarySerializable& object);
+
+      BinaryBlob& operator<<(const size_t& x);
+      BinaryBlob& operator<<(const int& x);
+      BinaryBlob& operator<<(const double& x);
+
+      BinaryBlob& operator>>(size_t& x);
+      BinaryBlob& operator>>(int& x);
+      BinaryBlob& operator>>(double& x);
+
    private:
+      template <class T> BinaryBlob& writeScalar(const T& x);
+      template <class T> BinaryBlob& readScalar(T& x);
+
       void grow(size_t numBytes);
       void growIfNeeded(size_t numBytesToBeAdded);
 
@@ -46,10 +62,9 @@ class BinaryBlob
 
 
 template <class T>
-BinaryBlob& BinaryBlob::operator<<(const T& x)
+BinaryBlob& BinaryBlob::writeScalar(const T& x)
 {
    growIfNeeded(sizeof(T));
-
    memcpy(m_writePtr, &x, sizeof(T));
    m_writePtr += sizeof(T);
    return *this;
@@ -58,10 +73,9 @@ BinaryBlob& BinaryBlob::operator<<(const T& x)
 
 
 template <class T>
-BinaryBlob& BinaryBlob::operator>>(T& x)
+BinaryBlob& BinaryBlob::readScalar(T& x)
 {
    assert( (m_readPtr + sizeof(T)) <= m_writePtr );
-
    memcpy(&x, m_readPtr, sizeof(T));
    m_readPtr += sizeof(T);
    return *this;
@@ -93,7 +107,7 @@ BinaryBlob& BinaryBlob::operator>>(std::vector<T>& x)
 
    const auto readEnd = m_readPtr + len * sizeof(T);
 
-   assert( readEnd <= m_writePtr);
+   assert(readEnd <= m_writePtr);
    x.insert(x.end(), reinterpret_cast<T*>(m_readPtr), reinterpret_cast<T*>(readEnd));
    m_readPtr = readEnd;
 

@@ -13,8 +13,8 @@ class SerializableRealVector : public IBinarySerializable
       SerializableRealVector(BinaryBlob& blob);
       SerializableRealVector(const std::vector<double>& vector);
 
-      BinaryBlob toBinaryBlob() const;
-      void fromBinaryBlob(BinaryBlob& blob);
+      void streamToBlob(BinaryBlob& blob) const;
+      void initFromBlob(BinaryBlob& blob);
 
    public:
       std::vector<double>   vec;

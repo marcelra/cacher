@@ -1,7 +1,11 @@
 #include "SerializableRealVector.h"
 
+#include "BinaryBlob.h"
+
 #include <string.h>
 #include <iostream>
+
+
 
 
 
@@ -14,7 +18,7 @@ SerializableRealVector::SerializableRealVector() :
 SerializableRealVector::SerializableRealVector(BinaryBlob& blob) :
    vec()
 {
-   fromBinaryBlob(blob);
+   initFromBlob(blob);
 }
 
 
@@ -25,15 +29,13 @@ SerializableRealVector::SerializableRealVector(const std::vector<double>& vector
 
 
 
-BinaryBlob SerializableRealVector::toBinaryBlob() const
+void SerializableRealVector::streamToBlob(BinaryBlob& blob) const
 {
-   BinaryBlob blob;
    blob << vec;
-   return blob;
 }
 
 
-void SerializableRealVector::fromBinaryBlob(BinaryBlob& blob)
+void SerializableRealVector::initFromBlob(BinaryBlob& blob)
 {
    vec.clear();
    blob >> vec;

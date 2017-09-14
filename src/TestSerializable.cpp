@@ -1,5 +1,7 @@
 #include "TestSerializable.h"
 
+#include "BinaryBlob.h"
+
 #include <string.h>
 
 
@@ -10,16 +12,14 @@ TestSerializable::TestSerializable() :
 
 
 
-BinaryBlob TestSerializable::toBinaryBlob() const
+void TestSerializable::streamToBlob(BinaryBlob& blob) const
 {
-   BinaryBlob blob;
    blob << m_integer;
-   return blob;
 }
 
 
 
-void TestSerializable::fromBinaryBlob(BinaryBlob& blob)
+void TestSerializable::initFromBlob(BinaryBlob& blob)
 {
    blob >> m_integer;
 }
